@@ -1,0 +1,308 @@
+@import '../index.css';
+@import '../../styles/Particles.css';
+@import '../../components/ui/StarBorder.css';
+@import '../../components/ui/MagicBento.css';
+@import '../../components/Stepper.css';
+@import '../../components/Folder.css';
+@import '../../components/InfiniteMenu.css';
+@import '../../components/ScrollStack.css';
+@import '../../components/TargetCursor.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.role-folder-card {
+  position: relative;
+  width: 100%;
+  min-height: 156px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.role-folder-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 240px;
+  padding-top: 8px;
+}
+
+.role-folder-root {
+  display: inline-flex;
+  transform: translateY(-4px) scale(0.92);
+  transform-origin: center top;
+}
+
+.progress-scroll-stack .scroll-stack-inner {
+  padding: 10vh 2rem 20rem;
+}
+
+.progress-scroll-stack .scroll-stack-card {
+  height: auto;
+  min-height: 96px;
+  margin: 12px 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #181919;
+  border: 1px solid #343636;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.progress-session-row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 2fr) 80px 90px 110px 120px;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: #a3a3a3;
+}
+
+.progress-session-row > div {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-session-date {
+  font-size: 13px;
+  color: #f3f1ef;
+  font-weight: 600;
+}
+
+.progress-session-topics {
+  font-size: 12px;
+  color: #a3a3a3;
+}
+
+.progress-session-score {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f3f1ef;
+}
+
+.progress-session-accuracy {
+  font-size: 13px;
+  color: #f3f1ef;
+}
+
+.progress-session-verdicts {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: #d9d9d9;
+}
+
+.progress-session-verdicts span:last-child {
+  color: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  .progress-session-row {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+  }
+}
+
+.role-folder-role-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #f8f8f8 0%, #f1f1f1 100%);
+  color: #111111;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.role-folder-role-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.role-folder-role-card.is-selected {
+  border-color: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 100%);
+}
+
+.role-folder-role-card:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.role-folder-role-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.role-folder-card:focus-visible {
+  outline: 1px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 2px;
+}
+
+.role-folder-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.role-folder-paper {
+  height: 100%;
+  width: 100%;
+}
+
+.role-folder-paper-muted {
+  opacity: 0.7;
+}
+
+.role-folder-paper-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  color: #121313;
+}
+
+.role-folder-icon {
+  font-size: 13px;
+}
+
+.role-folder-title {
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.role-folder-desc {
+  font-size: 7px;
+  line-height: 1.2;
+  color: #373737;
+}
+
+:root {
+  --background: 0 0% 5%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 9%;
+  --card-foreground: 0 0% 96%;
+  --popover: 0 0% 9%;
+  --popover-foreground: 0 0% 96%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 5%;
+  --secondary: 0 0% 14%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 64%;
+  --accent: 0 0% 100%;
+  --accent-foreground: 0 0% 5%;
+  --accent-soft: 0 0% 100% / 0.12;
+  --border: 0 0% 24%;
+  --ring: 0 0% 100%;
+  --surface-elevated: 0 0% 12%;
+  --surface-glass: 0 0% 9% / 0.68;
+  --hero-glow: 0 0% 100% / 0.14;
+  --font-sans: 'Inter';
+  --font-display: 'Space Grotesk';
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, hsl(var(--hero-glow)), transparent 34%),
+    radial-gradient(circle at top right, hsl(var(--hero-glow)), transparent 28%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans), sans-serif;
+}
+
+@keyframes auth-orb-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: translate3d(22px, -18px, 0) scale(1.08);
+    opacity: 0.72;
+  }
+}
+
+@layer components {
+  .auth-orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+    animation: auth-orb-drift 12s ease-in-out infinite;
+  }
+
+  .auth-orb-a {
+    top: 10%;
+    left: -4rem;
+    width: 22rem;
+    height: 22rem;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 60%, transparent 72%);
+  }
+
+  .auth-orb-b {
+    right: -3rem;
+    bottom: 8%;
+    width: 18rem;
+    height: 18rem;
+    animation-delay: -4s;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 60%, transparent 72%);
+  }
+}
+
+::selection {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+@layer components {
+  .saas-shell {
+    @apply relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .saas-section {
+    @apply relative py-20 sm:py-24;
+  }
+
+  .saas-heading {
+    @apply font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl;
+  }
+
+  .saas-subheading {
+    @apply max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg;
+  }
+
+  .glass-panel {
+    @apply border border-white/10 bg-surface-glass/80 shadow-[0_20px_80px_-30px_rgba(0,0,0,0.65)] backdrop-blur-xl;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-border/80 bg-card/90 shadow-[0_18px_45px_-28px_rgba(0,0,0,0.72)];
+  }
+
+  .hero-orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+  }
+}

@@ -1,0 +1,27 @@
+# environment files
+.env
+backend/.env
+backend/.env.local
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# node / frontend build output
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
+frontend/.turbo/
+
+# databases and local runtime files
+*.db
+*.sqlite
+*.sqlite3
+
+# editor / OS
+.DS_Store
+Thumbs.db
