@@ -8,8 +8,11 @@ import ModeSplitCard from '../components/dashboard/ModeSplitCard'
 import TopicTrackerCard from '../components/dashboard/TopicTrackerCard'
 import ScenarioStatsCard from '../components/dashboard/ScenarioStatsCard'
 import LeaderboardCard from '../components/dashboard/LeaderboardCard'
+import useAuth from '../hooks/useAuth'
 
 export default function Dashboard() {
+  const { user } = useAuth()
+
   return (
     <div className="waves-page profile-dashboard">
       <Waves
@@ -32,7 +35,9 @@ export default function Dashboard() {
         <div className="mx-auto max-w-[1200px] px-5 pb-16">
           <div className="mb-4">
             <div className="text-[12px] text-white/60">Portal / Dashboard</div>
-            <div className="profile-heading mt-1 text-[24px] font-semibold text-white">Good morning Jhon</div>
+            <div className="profile-heading mt-1 text-[24px] font-semibold text-white">
+              Good morning {user?.name?.split(' ')[0] || 'User'}
+            </div>
           </div>
 
           <div className="grid items-stretch gap-4 p-5" style={{ gridTemplateColumns: '240px 1fr' }}>
