@@ -1,11 +1,19 @@
-FROM node:18-alpine AS builder
+FROM node:22-bookworm-slim AS builder
 WORKDIR /app
-COPY frontend/package*.json ./
-RUN npm ci
-COPY frontend/ ./
-RUN npm run build --if-present
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY package.json package-lock.json .npmrc ./
+RUN npm ci --no-audit --no-fund
+COPY . .
+ARG NEXT_PUBLIC_API_BASE_URL=/api
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+RUN mkdir -p public && npm run build
 
-FROM nginx:stable-alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:22-bookworm-slim AS runner
+WORKDIR /app
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
+USER node
+EXPOSE 3000
+CMD ["node", "server.js"]
