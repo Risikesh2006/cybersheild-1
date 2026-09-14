@@ -1,27 +1,24 @@
-# environment files
 .env
-backend/.env
-backend/.env.local
-
-# python
+.env.*
+!.env.example
+.venv/
+.venv*/
+node_modules/
+.next/
 __pycache__/
 *.pyc
-*.pyo
+*.db
+*.db-*
+*.sqlite*
+*.log
+*.pem
+*.key
+*.tsbuildinfo
+.runtime/
+
 .pytest_cache/
 .mypy_cache/
-
-# node / frontend build output
-node_modules/
-frontend/node_modules/
-frontend/.next/
-frontend/dist/
-frontend/.turbo/
-
-# databases and local runtime files
-*.db
-*.sqlite
-*.sqlite3
-
-# editor / OS
 .DS_Store
 Thumbs.db
+frontend/.turbo/
+frontend/dist/
