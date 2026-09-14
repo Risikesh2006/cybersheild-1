@@ -1,8 +1,9 @@
 import os
 import secrets
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).with_name(".env"))
 
 DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
 
@@ -22,14 +23,13 @@ SECRET_KEY = SECRET_KEY or secrets.token_urlsafe(48)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./cybershield.db")
-ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 GOOGLE_OAUTH_REDIRECT = os.getenv("GOOGLE_OAUTH_REDIRECT", "http://localhost:8000/auth/google/callback")
 
 # AI Model
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-3-5-haiku-20241022")
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 
 # XP Level thresholds
 LEVEL_THRESHOLDS = {
@@ -62,6 +62,12 @@ VERDICT_VALUES = {
     "Critical": 0.0,
 }
 
-CORS_ORIGINS = [v.strip().rstrip("/") for v in os.getenv("CORS_ORIGINS", FRONTEND_URL).split(",") if v.strip()]
+CORS_ORIGINS = list(dict.fromkeys([
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://cybershield-azure-delta.vercel.app",
+    FRONTEND_URL.rstrip("/"),
+    *[v.strip().rstrip("/") for v in os.getenv("CORS_ORIGINS", "").split(",") if v.strip()],
+]))
 if ENVIRONMENT != "production":
     CORS_ORIGINS += [f"http://{host}:{port}" for host in ("localhost", "127.0.0.1") for port in (3000, 3001, 3002, 5173)]

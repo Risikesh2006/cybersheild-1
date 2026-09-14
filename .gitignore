@@ -1,7 +1,10 @@
 .env
+.env.local
 .env.*
 !.env.example
 .venv/
+venv/
+dist/
 .venv*/
 node_modules/
 .next/

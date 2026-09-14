@@ -1,0 +1,36 @@
+# Free hackathon service: SQLite is ephemeral unless a paid disk is added.
+# Render prompts for both secret values. No credentials are generated here.
+services:
+  - type: web
+    name: cybershield-api
+    runtime: python
+    plan: free
+    repo: https://github.com/Risikesh2006/cybersheild-1
+    branch: main
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: ENVIRONMENT
+        value: production
+      - key: DEMO_MODE
+        value: "false"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: DATABASE_URL
+        value: sqlite:///./cybershield.db
+      - key: FRONTEND_URL
+        value: https://cybershield-azure-delta.vercel.app
+      - key: CORS_ORIGINS
+        value: http://localhost:3000,http://localhost:5173,https://cybershield-azure-delta.vercel.app
+      - key: CLAUDE_MODEL
+        value: claude-haiku-4-5-20251001
+      - key: CLAUDE_SCENARIO_MODEL
+        value: claude-sonnet-4-6

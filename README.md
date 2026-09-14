@@ -20,7 +20,7 @@ A central orchestrator coordinates five specialist agents for curriculum plannin
 | 3?5 minute Demo Video | [Presentation with embedded preview and recording plan](docs/presentation/README.md) |
 | Runnable or Deployed Version | [Local setup](#quick-start) and [Docker deployment](deployment/README.md) |
 
-**Video status:** the presentation includes the original 54.5-second preview. A full 3?5 minute recording remains to be added. **Hosting status:** the local application and production build have been tested. No public deployment URL is available yet.
+**Video status:** the presentation includes the original 54.5-second preview. A full 3?5 minute recording remains to be added. **Hosting status:** the [Vercel frontend](https://cybershield-azure-delta.vercel.app/) is online. The Render backend and live AI connection still require deployment and verification. Follow the [Render + Vercel guide](deployment/render-vercel.md).
 
 ## What the application does
 
@@ -69,13 +69,13 @@ The planner builds the session plan from the learner profile and selected topics
 | Persistence | SQLAlchemy and SQLite |
 | Authentication | JWT and bcrypt, with optional Google OAuth |
 | Live AI integrations | Anthropic and optional Gemini for scenario generation |
-| Deployment | Docker Compose with a Caddy gateway |
+| Deployment | Vercel frontend + Render backend; Docker Compose also supported |
 
 ## Quick start
 
 ### Requirements
 
-- Python 3.11 or newer. Local verification used Python 3.14.
+- Python 3.11 or newer. Backend workflow verification passes on Python 3.11.11 (the Render target).
 - Node.js 20.9 or newer and npm. Local verification used Node.js 24, while CI and the frontend container use Node.js 22.
 - Internet access for the initial dependency installation.
 

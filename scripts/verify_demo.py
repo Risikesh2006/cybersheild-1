@@ -2,6 +2,7 @@
 import json, os, secrets, socket, subprocess, sys, tempfile, time
 from pathlib import Path
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 backend = Path(__file__).resolve().parents[1] / "backend"
 with socket.socket() as sock:
@@ -18,14 +19,14 @@ def request(path, data=None):
         return json.load(response)
 
 with tempfile.TemporaryDirectory(prefix="cybershield-check-") as temp:
-    env = dict(os.environ, DEMO_MODE="true", SECRET_KEY=secrets.token_urlsafe(48),
+    env = dict(os.environ, ENVIRONMENT="production", DEMO_MODE="true", SECRET_KEY=secrets.token_urlsafe(48),
                DATABASE_URL="sqlite:///" + (Path(temp)/"check.db").as_posix(), PYTHONDONTWRITEBYTECODE="1")
     with open(Path(temp)/"server.log", "w") as log:
         server = subprocess.Popen([sys.executable, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", str(port)], cwd=backend, env=env, stdout=log, stderr=log)
         try:
             for _ in range(60):
                 try:
-                    assert request("/health")["status"] == "ok"
+                    assert request("/health") == {"status": "ok", "service": "CyberShield API"}
                     break
                 except Exception:
                     if server.poll() is not None:
@@ -33,10 +34,26 @@ with tempfile.TemporaryDirectory(prefix="cybershield-check-") as temp:
                     time.sleep(0.5)
             else:
                 raise RuntimeError("Backend startup timed out")
+            with urlopen(base + "/docs", timeout=30) as response:
+                assert response.status == 200 and b"swagger-ui" in response.read()
+            assert "/session/start" in request("/openapi.json")["paths"]
+            for origin in ("http://localhost:3000", "http://localhost:5173", "https://cybershield-azure-delta.vercel.app"):
+                preflight = Request(base + "/auth/login", method="OPTIONS", headers={
+                    "Origin": origin, "Access-Control-Request-Method": "POST",
+                    "Access-Control-Request-Headers": "authorization,content-type"})
+                with urlopen(preflight, timeout=30) as response:
+                    assert response.status == 200
+                    assert response.headers["Access-Control-Allow-Origin"] == origin
+            try:
+                request("/auth/me")
+                raise AssertionError("Protected route accepted an unauthenticated request")
+            except HTTPError as error:
+                assert error.code in (401, 403)
             password = secrets.token_urlsafe(18)
             account = {"name":"Demo Verification", "email":"demo@example.com", "password":password, "user_type":"student"}
             token = request("/auth/signup", account)["access_token"]
             token = request("/auth/login", {"email":account["email"], "password":password})["access_token"]
+            assert request("/auth/me")["user"]["email"] == account["email"]
             request("/onboarding/topics", {"topics":["Network Security", "Endpoint Security"]})
             start = request("/session/start", {})
             session_id = start["session_id"]
@@ -56,11 +73,15 @@ with tempfile.TemporaryDirectory(prefix="cybershield-check-") as temp:
             else:
                 raise AssertionError("Session did not complete")
             assert request("/progress/history")
-            assert request("/progress/dashboard")
+            dashboard = request("/progress/dashboard")
+            assert dashboard["total_scenarios"] == completed
+            assert sum(topic["attempts"] for topic in dashboard["topic_mastery_list"]) == completed
+            assert request("/auth/me")["profile"]["xp"] == dashboard["xp"]
+            assert request(f"/progress/narrative?session_id={session_id}")["narrative"]
             assert request("/session/active")["session"] is None
             second = request("/session/start", {})
             request("/session/calloff", {"session_id":second["session_id"]})
-            print(f"PASS: health, signup, login, onboarding, start, pause, resume, {completed} submissions, completion, narrative, history, dashboard, calloff. No AI credentials used.")
+            print(f"PASS: production startup, health, Swagger, CORS (3 origins), protected route, signup, login, profile, onboarding, start, pause, resume, {completed} submissions, completion, narrative, history, dashboard, learner updates, XP consistency, calloff. No AI credentials used.")
         finally:
             if os.name == "nt":
                 subprocess.run(["taskkill", "/PID", str(server.pid), "/T", "/F"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
