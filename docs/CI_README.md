@@ -1,39 +1,22 @@
-# CI / CD Pipeline
+# Continuous integration
 
-This repository includes a basic CI pipeline and Docker support for local development and GitHub Actions.
+The workflow in `.github/workflows/ci.yml` runs on pushes and pull requests targeting main or master.
 
-Included files
+1. Backend: installs dependencies on Python 3.14 and runs the isolated, credential-free training workflow with production configuration.
+2. Frontend: installs from package-lock.json on Node.js 22 and builds the Next.js production bundle.
+3. Deployment: builds both containers, starts Compose, waits for health checks, and requests the homepage and `/api/health` through Caddy.
 
-- `.github/workflows/ci.yml` — GitHub Actions workflow that runs backend checks, builds frontend, and builds Docker images.
-- `backend/Dockerfile` — Dockerfile to build the FastAPI backend.
-- `frontend/Dockerfile` — Dockerfile to build the frontend and serve static files using nginx (assumes output in `dist`).
-- `docker-compose.yml` — Compose file to run backend and frontend together for local testing.
-- `Makefile` — Handy targets to install deps, run tests and build images.
+The deployment job generates an ephemeral secret only on the runner. It never uploads `.env`, records no passwords or bearer tokens, and removes temporary volumes after the job. Failures propagate to workflow status. No step publishes images or deploys a public website.
 
-Usage
+Local equivalents:
 
-1. Run CI locally (simple):
-
-```bash
-make backend-install
-make frontend-install
-make frontend-build
+```sh
+python scripts/verify_demo.py
+cd frontend
+npm ci
+npm run build
 ```
 
-2. Build Docker images locally:
+See the deployment guide for Docker setup. A workflow definition does not imply a successful remote run. Check the Actions result for the pushed commit.
 
-```bash
-make docker-build
-```
-
-3. Run services with docker-compose:
-
-```bash
-docker-compose up --build
-```
-
-Notes
-
-- The pipeline is conservative: tests and linters are executed only when present. Some commands are permissive (`|| true`) so they won't fail the workflow when tests are absent.
-- The frontend `Dockerfile` assumes the build output is in `dist` (Vite). If your frontend is Next.js or outputs to `.next`, update the Dockerfile accordingly.
-- To push images from CI, update `.github/workflows/ci.yml` to add a deploy step and provide registry credentials via repository secrets.
+The committed frontend `.npmrc` preserves the legacy peer-dependency resolution used to create the lockfile. The frontend Docker build copies this configuration before installing.
