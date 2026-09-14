@@ -1,1023 +1,228 @@
-<div align="center">
+# CyberShield
 
-# 🛡️ CyberShield
+### Adaptive cybersecurity training with coordinated AI agents
 
-### Agentic AI-Powered Adaptive Cybersecurity Training Platform
+**Agentic AI Hackathon ? Indian Institute of Technology Bhubaneswar**
 
-> An intelligent Blue Team training platform where users respond to realistic AI-generated cyber incidents while a multi-agent system continuously evaluates performance, identifies weaknesses, and adapts the next challenge.
+CyberShield is a browser-based training prototype for practising defensive cybersecurity decisions. Learners work through simulated incidents, compare four possible actions, receive explained feedback, and review their progress across sessions.
 
-[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](#prerequisites)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](#prerequisites)
-[![React](https://img.shields.io/badge/React-18-61DAFB)](#tech-stack)
-[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688)](#tech-stack)
-[![Claude](https://img.shields.io/badge/AI-Claude%20Sonnet-orange)](#agentic-ai-system)
-[![Status](https://img.shields.io/badge/status-active--development-yellow)](#roadmap)
+A central orchestrator coordinates five specialist agents for curriculum planning, scenario generation, evaluation, learner profiling, and session debriefs.
 
-</div>
+[Presentation](docs/presentation/CyberShield_IIT_Bhubaneswar.pptx) ? [Architecture](docs/architecture.md) ? [Deployment guide](deployment/README.md) ? [Demo walkthrough](docs/demo-guide.md)
 
----
+## Submission materials
 
-## What is CyberShield?
-
-**CyberShield** is an Agentic AI-powered cybersecurity training platform designed to provide personalized and adaptive Blue Team learning experiences.
-
-Instead of static quizzes, CyberShield places the learner inside realistic cybersecurity incidents involving:
-
-- Network Security
-- Endpoint Security
-- Cloud Security
-- Identity & Access Management
-- Incident Response
-- Threat Intelligence
-- Malware Analysis
-- Social Engineering
-- Secure Coding
-- Compliance & GRC
-
-The learner acts as a **Blue Team defender** and must decide how to respond to each incident.
-
-A central AI Orchestrator coordinates multiple specialized AI agents that generate scenarios, evaluate responses, update the learner profile, plan future training, and generate post-session feedback.
-
----
-
-## Why CyberShield?
-
-Traditional cybersecurity training often depends on:
-
-- Static multiple-choice questions
-- Fixed difficulty
-- Same content for every learner
-- Limited personalized feedback
-- No long-term learner analysis
-
-CyberShield instead continuously analyzes:
-
-- Learner strengths
-- Learner weaknesses
-- Decision-making patterns
-- Risky choices
-- Cross-session performance
-- Topic progression
-- Recommended next training area
-
-This creates an adaptive training loop:
-
-```text
-Learn
-  ↓
-Respond
-  ↓
-Evaluate
-  ↓
-Profile
-  ↓
-Adapt
-  ↓
-Train Again
-```
-
-CyberShield is therefore not just a chatbot or quiz generator.
-
-It acts as an **adaptive cybersecurity training agent**.
-
----
-
-## 🎯 Core Objectives
-
-1. Provide realistic cybersecurity incident-response training.
-2. Personalize scenarios based on learner ability.
-3. Analyze decision-making patterns across sessions.
-4. Dynamically adapt future training based on weaknesses.
-5. Provide measurable and explainable learner progress.
-
----
-
-## 🤖 Agentic AI System
-
-CyberShield uses one central Orchestrator and five specialized AI agents.
-
-| Agent | Role |
+| Requirement | Deliverable |
 |---|---|
-| **OrchestratorAgent** | Coordinates all agents, manages session flow, and controls database updates |
-| **ProfilerAgent** | Builds and continuously updates the learner skill profile |
-| **ScenarioGeneratorAgent** | Generates realistic SIEM/EDR-style cyber incidents with four defensible choices |
-| **EvaluatorAgent** | Evaluates user decisions and generates feedback |
-| **ProgressNarratorAgent** | Produces post-session debriefs and cross-session performance summaries |
-| **CurriculumPlannerAgent** | Plans future topics while enforcing prerequisites and adapting to learner weaknesses |
+| Problem & Solution Brief | [Project brief](docs/problem-and-solution.md) |
+| System Architecture / Workflow | [Architecture and workflow](docs/architecture.md) |
+| Source Code / GitHub Repository | The backend and frontend in this repository |
+| 3?5 minute Demo Video | [Presentation with embedded preview and recording plan](docs/presentation/README.md) |
+| Runnable or Deployed Version | [Local setup](#quick-start) and [Docker deployment](deployment/README.md) |
 
-All agents operate through the central **OrchestratorAgent**.
+**Video status:** the presentation includes the original 54.5-second preview. A full 3?5 minute recording remains to be added. **Hosting status:** the local application and production build have been tested. No public deployment URL is available yet.
 
----
+## What the application does
 
-## 🧠 How the System Works
+- Registers learners as students, professionals, or enterprise users.
+- Provides topic selection across ten cybersecurity domains.
+- Plans training sessions and presents incidents with four defensive choices.
+- Returns a verdict, XP change, explanation, and improvement tip after a response.
+- Stores skill profiles, responses, session history, and progress summaries.
+- Supports pause, resume, and early termination of training sessions.
 
-### 1. Learner Profile
+The incidents are simulations. CyberShield does not monitor or modify real networks.
 
-CyberShield creates or loads the learner profile containing:
+## Agent architecture
 
-- Total XP
-- Current level
-- Completed topics
-- Topic strengths
-- Topic weaknesses
-- Historical performance
-- Decision patterns
-
----
-
-### 2. Curriculum Planning
-
-The `CurriculumPlannerAgent` determines which cybersecurity topic should be trained next.
-
-The learner can choose topics, but prerequisites are enforced.
-
-Example:
-
-```text
-Network Security
-      ↓
-Cloud Security
+```mermaid
+flowchart TD
+    Learner[Browser: Next.js and React] --> API[FastAPI routes]
+    API --> Auth[JWT authentication]
+    API --> O[Orchestrator]
+    O --> C[Curriculum planner]
+    O --> S[Scenario generator]
+    O --> E[Evaluator]
+    O --> P[Profiler]
+    O --> N[Progress narrator]
+    O --> DB[(SQLite via SQLAlchemy)]
+    API --> DB
 ```
 
----
-
-### 3. Scenario Generation
-
-The `ScenarioGeneratorAgent` generates realistic cybersecurity scenarios such as:
-
-- Suspicious authentication activity
-- Ransomware
-- Malware execution
-- Phishing
-- Privilege escalation
-- Endpoint compromise
-- Cloud access anomalies
-- Unauthorized network activity
-
-Each scenario contains **four realistic and defensible actions**.
-
-There should be no obviously wrong answer.
-
----
-
-### 4. Learner Decision
-
-The learner selects an action.
-
-The action is classified as:
-
-| Verdict | XP |
-|---|---:|
-| Optimal | +10 |
-| Suboptimal | +5 |
-| Risky | -5 |
-| Critical | -10 |
-
----
-
-### 5. AI Evaluation
-
-The `EvaluatorAgent` evaluates the learner's response based on:
-
-- Security impact
-- Containment quality
-- Investigation approach
-- Operational risk
-- Business impact
-- Incident-response effectiveness
-
-Feedback is adapted for:
-
-- Student
-- Professional
-- Enterprise
-
----
-
-### 6. Learner Profile Update
-
-The `ProfilerAgent` updates the learner profile after every scenario.
-
-Example:
-
-```text
-Strong Areas:
-✓ Network Analysis
-✓ Threat Detection
-
-Needs Improvement:
-⚠ Incident Prioritization
-⚠ Identity & Access Management
-```
-
----
-
-### 7. Adaptive Training
-
-The Orchestrator decides what should happen next.
-
-```text
-Learner struggles with phishing investigation
-                 ↓
-Profiler detects weakness
-                 ↓
-Curriculum Planner adjusts training focus
-                 ↓
-Scenario Generator creates another related scenario
-                 ↓
-Difficulty is adjusted
-```
-
----
-
-### 8. Session Debrief
-
-The `ProgressNarratorAgent` generates a session summary containing:
-
-- XP earned
-- Strong decisions
-- Weak decisions
-- Skill changes
-- Topic performance
-- Recommended next topic
-- Cross-session improvement
-
----
-
-## 🔁 Adaptive Feedback Loop
-
-```text
-┌───────────────────────┐
-│        Learner        │
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────┐
-│ Cybersecurity Scenario│
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────┐
-│    Learner Decision   │
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────┐
-│    Evaluator Agent    │
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────┐
-│     Profiler Agent    │
-└───────────┬───────────┘
-            │
-            ▼
-┌─────────────────────────┐
-│ Curriculum Planner Agent│
-└───────────┬─────────────┘
-            │
-            ▼
-┌───────────────────────┐
-│ Scenario Generator    │
-│ Adjusts Difficulty    │
-└───────────┬───────────┘
-            │
-            └──────────────► Next Scenario
-```
-
----
-
-## 🏗️ Architecture at a Glance
-
-```text
-                    ┌──────────────────────┐
-                    │       Learner        │
-                    │   Blue Team Trainee  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │    React Frontend    │
-                    │ Dashboard / Training │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │    FastAPI Backend   │
-                    │ Auth / Sessions / API│
-                    └──────────┬───────────┘
-                               │
-                               ▼
-               ┌──────────────────────────────┐
-               │   CyberShield Orchestrator   │
-               │            Agent             │
-               └──────────────┬───────────────┘
-                              │
-          ┌───────────────────┼────────────────────┐
-          │                   │                    │
-          ▼                   ▼                    ▼
-┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
-│ Profiler Agent   │ │ Scenario Agent   │ │ Evaluator Agent  │
-└──────────────────┘ └──────────────────┘ └──────────────────┘
-          │                   │                    │
-          └────────────┬──────┴────────────┬───────┘
-                       │                   │
-                       ▼                   ▼
-             ┌───────────────────┐ ┌────────────────────┐
-             │ Curriculum Agent  │ │ Progress Narrator  │
-             └─────────┬─────────┘ └─────────┬──────────┘
-                       │                     │
-                       └──────────┬──────────┘
-                                  ▼
-                        ┌──────────────────┐
-                        │ Anthropic Claude │
-                        │  Sonnet Model    │
-                        └─────────┬────────┘
-                                  │
-                                  ▼
-                        ┌──────────────────┐
-                        │ SQLite Database  │
-                        │ Users / Sessions │
-                        │ Skills / Scores  │
-                        └──────────────────┘
-```
-
----
-
-## ⚙️ Core Agentic Behaviors
-
-### Goal-Driven Execution
-
-CyberShield works toward the long-term goal of improving the learner's cybersecurity decision-making skills.
-
-### Dynamic Action Selection
-
-The platform dynamically selects future scenarios based on learner performance.
-
-### Multi-Step Execution
-
-```text
-Scenario Generation
-        ↓
-Learner Decision
-        ↓
-Evaluation
-        ↓
-Profile Update
-        ↓
-Curriculum Update
-        ↓
-Next Scenario
-```
-
-### Adaptation
-
-Scenario difficulty and topic focus change based on learner performance.
-
-### Robustness
-
-Sessions can be:
-
-- Paused
-- Resumed
-- Ended early
-
-without automatically penalizing the learner.
-
----
-
-## 🎮 Gamified Training System
-
-### XP System
-
-| Decision Quality | XP |
-|---|---:|
-| Optimal | +10 |
-| Suboptimal | +5 |
-| Risky | -5 |
-| Critical | -10 |
-
-### Levels
-
-```text
-Beginner
-0 – 79 XP
-
-    ↓
-
-Intermediate
-80 – 199 XP
-
-    ↓
-
-Advanced
-200+ XP
-```
-
----
-
-## 📚 Available Topics
-
-| Topic | Prerequisite |
+| Component | Responsibility |
 |---|---|
-| Network Security | None |
-| Endpoint Security | None |
-| Cloud Security | Network Security |
-| Identity & Access Management | None |
-| Incident Response | None |
-| Threat Intelligence | Incident Response |
-| Malware Analysis | Endpoint Security |
-| Social Engineering | None |
-| Secure Coding | None |
-| Compliance & GRC | Incident Response |
+| Orchestrator | Coordinates the session and persists training changes |
+| Curriculum planner | Selects the session topic sequence and training focus |
+| Scenario generator | Produces simulated incidents and four response choices |
+| Evaluator | Explains the chosen action and assigns a verdict and score |
+| Profiler | Maintains topic skills and decision patterns |
+| Progress narrator | Produces the session debrief |
 
----
+The planner builds the session plan from the learner profile and selected topics. After each response, the evaluator and profiler update the learner state. The orchestrator advances through the plan and generates the next scenario or a closing narrative.
 
-## 🧩 Core Rules
+## Technology
 
-1. All four scenario options must be defensible.
-2. There should be no obviously wrong answers.
-3. One option is operationally optimal.
-4. Difficulty changes based on learner performance.
-5. Feedback is adapted for Student, Professional, and Enterprise users.
-6. Sessions can be paused or resumed.
-7. Users can select topics.
-8. Topic prerequisites are enforced.
-9. Performance is tracked across multiple sessions.
-10. Historical weaknesses influence future scenarios.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
+| Layer | Implementation |
 |---|---|
-| Frontend | React 18 |
-| Build Tool | Vite |
-| Styling | Tailwind CSS |
-| Routing | React Router v6 |
-| Charts | Recharts |
-| API Client | Axios |
-| Backend | FastAPI |
-| ORM | SQLAlchemy |
-| Database | SQLite |
-| Authentication | JWT with python-jose |
-| Password Security | Passlib / bcrypt |
-| Validation | Pydantic v2 |
-| Generative AI | Anthropic Claude Sonnet |
-| AI SDK | Anthropic Python SDK |
+| Interface | Next.js 15, React 18, Tailwind CSS, Recharts, Axios |
+| API | Python, FastAPI, Pydantic |
+| Persistence | SQLAlchemy and SQLite |
+| Authentication | JWT and bcrypt, with optional Google OAuth |
+| Live AI integrations | Anthropic and optional Gemini for scenario generation |
+| Deployment | Docker Compose with a Caddy gateway |
 
----
+## Quick start
 
-## 📁 Project Structure
+### Requirements
 
-```text
-CyberShield/
-│
-├── backend/
-│   ├── agents/
-│   │   ├── orchestrator_agent.py
-│   │   ├── profiler_agent.py
-│   │   ├── scenario_generator_agent.py
-│   │   ├── evaluator_agent.py
-│   │   ├── progress_narrator_agent.py
-│   │   └── curriculum_planner_agent.py
-│   │
-│   ├── models/
-│   ├── routes/
-│   ├── schemas/
-│   ├── main.py
-│   ├── config.py
-│   ├── database.py
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   └── App.jsx
-│   │
-│   ├── package.json
-│   └── vite.config.js
-│
-└── README.md
-```
+- Python 3.11 or newer. Local verification used Python 3.14.
+- Node.js 20.9 or newer and npm. Local verification used Node.js 24, while CI and the frontend container use Node.js 22.
+- Internet access for the initial dependency installation.
 
----
+The frontend `.npmrc` preserves the peer-dependency resolution used for the lockfile, including in CI and Docker.
 
-## ✅ Prerequisites
+The default demo requires no API keys. It uses the application's built-in fallback content. Live AI mode is optional.
 
-Before running CyberShield, install:
+### Windows PowerShell
 
-- Python 3.11+
-- Node.js 18+
-- npm
-- Git
-- Anthropic API Key
+Clone the repository and install dependencies:
 
----
-
-## 🚀 Setup Instructions
-
-### 1. Clone the Repository
-
-```bash
+```powershell
 git clone https://github.com/Risikesh2006/cybersheild-1.git
-```
-
-```bash
 cd cybersheild-1
+powershell -ExecutionPolicy Bypass -File scripts/Setup.ps1
 ```
 
----
+Start the backend in one terminal:
 
-## 🔧 Backend Setup
-
-```bash
-cd backend
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/Start-Backend.ps1
 ```
 
-### Windows
+Start the frontend in a second terminal:
 
-```bash
-copy .env.example .env
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/Start-Frontend.ps1
 ```
 
-### Linux / macOS
+| Service | Local address |
+|---|---|
+| Application | http://localhost:3002 |
+| API health | http://localhost:8001/health |
+| API documentation | http://localhost:8001/docs |
 
-```bash
-cp .env.example .env
-```
+Register a fresh account, choose Network Security and Endpoint Security, and begin a session. Stop each server with Ctrl+C.
 
-Install dependencies:
+### macOS / Linux
 
-```bash
-pip install -r requirements.txt
-```
-
-Start the backend:
-
-```bash
-uvicorn main:app --reload
-```
-
-Backend:
-
-```text
-http://localhost:8000
-```
-
-API Documentation:
-
-```text
-http://localhost:8000/docs
-```
-
----
-
-## 🎨 Frontend Setup
-
-Open another terminal:
-
-```bash
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r backend/requirements.txt
 cd frontend
+npm ci
+cd ../backend
+FRONTEND_URL=http://localhost:3002 python -m uvicorn main:app --host 127.0.0.1 --port 8001
 ```
 
-Install dependencies:
+In another terminal, from the repository root:
 
-```bash
-npm install
-```
-
-Run frontend:
-
-```bash
-npm run dev
-```
-
-Frontend:
-
-```text
-http://localhost:5173
-```
-
----
-
-## 🔐 Environment Configuration
-
-Create:
-
-```text
-backend/.env
-```
-
-Add:
-
-```env
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-
-SECRET_KEY=your_secure_jwt_secret_minimum_32_characters
-
-ACCESS_TOKEN_EXPIRE_MINUTES=1440
-
-DATABASE_URL=sqlite:///./cybershield.db
-
-ENVIRONMENT=development
-```
-
-> ⚠️ Never commit your real `.env` file.
-
-Recommended `.gitignore`:
-
-```gitignore
-.env
-*.db
-__pycache__/
-venv/
-.venv/
-node_modules/
-dist/
-```
-
----
-
-## 📦 Dependencies
-
-### Backend
-
-Main Python dependencies include:
-
-```text
-FastAPI
-Uvicorn
-SQLAlchemy
-Pydantic
-python-jose
-Passlib
-bcrypt
-Anthropic
-```
-
-Install them using:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Frontend
-
-Main frontend dependencies:
-
-```text
-React 18
-Vite
-React Router v6
-Tailwind CSS
-Recharts
-Axios
-```
-
-Install using:
-
-```bash
-npm install
-```
-
----
-
-## 🤖 AI Model Configuration
-
-CyberShield uses:
-
-```text
-claude-sonnet-4-20250514
-```
-
-through the Anthropic Python SDK.
-
-The model is used for:
-
-- Scenario generation
-- Learner-response evaluation
-- Personalized feedback
-- Learner profile analysis
-- Curriculum planning
-- Session debrief generation
-
-AI agents return structured JSON responses that can be processed reliably by the FastAPI backend.
-
----
-
-## 🧠 Scenario Design
-
-CyberShield avoids simple quiz-style questions.
-
-Example:
-
-```text
-Your SIEM detects repeated authentication failures from a privileged
-account followed by a successful login from an unusual location.
-
-What should you do first?
-```
-
-The AI generates four realistic actions.
-
-Example:
-
-```text
-A. Immediately disable every account in the organization.
-
-B. Investigate the successful login, validate the source,
-   and temporarily restrict the affected privileged account.
-
-C. Ignore the alert until additional suspicious behavior appears.
-
-D. Shut down the complete identity infrastructure.
-```
-
-The learner must reason about:
-
-- Containment
-- Business impact
-- Investigation
-- Risk
-- Operational continuity
-
----
-
-## 📊 Learner Analytics
-
-CyberShield tracks:
-
-- Total XP
-- Current level
-- Topic performance
-- Strongest skill
-- Weakest skill
-- Decision risk profile
-- Historical improvement
-- Recommended next topic
-- Cross-session trends
-
----
-
-## 🔄 Example Adaptive Learning Flow
-
-```text
-User selects:
-Incident Response
-        ↓
-Scenario Generator:
-Suspicious privileged login
-        ↓
-User chooses:
-Suboptimal action
-        ↓
-Evaluator:
-+5 XP
-        ↓
-Profiler:
-Weakness identified in Identity Incident Handling
-        ↓
-Curriculum Planner:
-Increase IAM-related training
-        ↓
-Scenario Generator:
-Creates another identity-related scenario
-        ↓
-User improves
-        ↓
-Progress Narrator:
-Highlights improvement during session debrief
-```
-
----
-
-## 🏆 Why CyberShield is Different
-
-Traditional training may ask:
-
-> What is phishing?
-
-CyberShield instead asks:
-
-> Your organization is experiencing a suspected phishing-led account compromise. What action should you take first?
-
-CyberShield trains **decision-making**, not just memorization.
-
-It focuses on:
-
-- Real-world situations
-- Operational thinking
-- Decision consequences
-- Adaptive difficulty
-- Personalized progression
-- Long-term learning
-
----
-
-## 🔒 Security Considerations
-
-- Passwords are hashed using bcrypt.
-- Authentication is handled using JWT tokens.
-- Sensitive credentials are stored in environment variables.
-- API keys are never hardcoded.
-- `.env` files should never be committed.
-- API requests are validated using Pydantic.
-- Database operations are handled through SQLAlchemy.
-- AI outputs are processed using structured responses.
-
----
-
-## 🧪 Testing the Application
-
-### Start Backend
-
-```bash
-cd backend
-uvicorn main:app --reload
-```
-
-### Start Frontend
-
-```bash
+```sh
 cd frontend
-npm run dev
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8001 npm run dev -- --port 3002
 ```
 
-Then:
+## Demo and live AI modes
 
-1. Register an account.
-2. Log in.
-3. Select learner type.
-4. Select a cybersecurity topic.
-5. Start a training session.
-6. Respond to AI-generated scenarios.
-7. Review AI evaluation.
-8. Continue training.
-9. Finish the session.
-10. Review your adaptive performance debrief.
-
----
-
-## 🛠️ Troubleshooting
-
-| Issue | Possible Cause | Fix |
+| Mode | Configuration | Behavior |
 |---|---|---|
-| Backend does not start | Missing Python dependency | Run `pip install -r requirements.txt` |
-| Anthropic API error | Missing or invalid API key | Check `backend/.env` |
-| Frontend cannot reach backend | Backend not running | Start FastAPI on port 8000 |
-| `npm` not found | Node.js not installed | Install Node.js 18+ |
-| `uvicorn` not found | Dependencies not installed | Reinstall requirements |
-| Database error | Incorrect database URL | Check `DATABASE_URL` |
-| AI scenario not generated | API/model issue | Verify API key and internet connection |
-| Port already in use | Another process is using it | Stop the process or change the port |
+| Local demo | `DEMO_MODE=true`, the default | Uses fallback scenarios and feedback without external AI calls |
+| Live AI | `DEMO_MODE=false` with private provider keys | Uses configured model providers, with fallback behavior on failure |
 
----
+For local live mode, copy `backend/.env.example` to `backend/.env` and set your own values. Anthropic supplies the planner, evaluator, profiler, and narrator. Scenario generation prefers configured Gemini, otherwise Anthropic. Provider availability and model access depend on your account.
 
-## 🗺️ Roadmap
+| Variable | Purpose |
+|---|---|
+| `DEMO_MODE` | Enables the credential-free fallback workflow |
+| `SECRET_KEY` | JWT signing secret, required in production |
+| `ANTHROPIC_API_KEY` | Private Anthropic credential for live mode |
+| `GEMINI_API_KEY` | Optional private Gemini credential |
+| `CLAUDE_MODEL` | Model used by Anthropic specialist agents |
+| `CLAUDE_SCENARIO_MODEL` | Anthropic scenario-generation model |
+| `GEMINI_SCENARIO_MODEL` | Gemini scenario-generation model |
+| `DATABASE_URL` | SQLAlchemy database connection |
+| `FRONTEND_URL` / `CORS_ORIGINS` | Frontend origin and allowed browser origins |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional Google OAuth configuration |
 
-- [x] Multi-agent cybersecurity architecture
-- [x] Scenario generation
-- [x] AI response evaluation
-- [x] XP-based progression
-- [x] Learner profiling
-- [x] Topic prerequisites
-- [x] Adaptive curriculum planning
-- [x] Session pause/resume
-- [x] Cross-session tracking
-- [x] AI session debrief
-- [ ] SIEM-style simulation interface
-- [ ] Threat intelligence integration
-- [ ] SOC collaboration mode
-- [ ] Enterprise dashboard
-- [ ] Achievement badges
-- [ ] Advanced learner analytics
-- [ ] Cloud deployment
-- [ ] Leaderboard and challenge mode
+A missing development signing secret generates a process-local value, so restarting the backend signs users out. Production rejects missing or unsuitable signing secrets. Keep a private, stable, randomly generated secret for deployed sessions.
 
----
+## Deployment
 
-## 📖 Architecture Documentation
+The repository contains production Dockerfiles, health checks, persistent database storage, and a Caddy gateway that exposes the frontend and `/api` under one address.
 
-CyberShield follows a layered Agentic AI architecture.
+1. Install Docker Engine and Compose v2 on the deployment host.
+2. Copy the root `.env.example` to `.env` and set a unique random `SECRET_KEY`.
+3. Run `docker compose up --build -d` from the repository root.
+4. Open http://localhost and verify http://localhost/api/health.
 
-The learner interacts through a React-based frontend. Requests are processed by the FastAPI backend, which manages authentication, sessions, user data, and communication with the AI layer.
+For a public domain, configure `PUBLIC_URL` and `SITE_ADDRESS` as described in the [deployment guide](deployment/README.md). The configuration targets a single Docker host with a persistent SQLite volume.
 
-At the center of the AI layer is the **OrchestratorAgent**.
+**Verification boundary:** Docker was unavailable on the preparation workstation. Container startup and HTTPS still require target-host verification. CI now includes a container integration job, whose result should be checked in [GitHub Actions](https://github.com/Risikesh2006/cybersheild-1/actions).
 
-The Orchestrator coordinates:
+## Verification
 
-- ProfilerAgent
-- ScenarioGeneratorAgent
-- EvaluatorAgent
-- ProgressNarratorAgent
-- CurriculumPlannerAgent
+With backend dependencies installed:
 
-Each learner action is evaluated and stored.
+```sh
+python scripts/verify_demo.py
+```
 
-The learner profile is updated after every interaction.
+On Windows, use `.venv/Scripts/python.exe scripts/verify_demo.py` if the virtual environment is not activated.
 
-This profile is then used to determine the next training activity.
+The script uses a temporary database and randomly generated credentials to check registration, login, topic selection, session start, pause, resume, submissions, completion, debriefs, history, progress, and early termination. It does not call AI providers or modify the normal training database.
+
+Build the frontend with:
+
+```sh
+cd frontend
+npm run build
+```
+
+See [verification notes](docs/verification.md) and the [CI guide](docs/CI_README.md) for the checks and their limits.
+
+## Repository structure
 
 ```text
-Learner
-   ↓
-Scenario
-   ↓
-Decision
-   ↓
-Evaluation
-   ↓
-Skill Analysis
-   ↓
-Adaptive Planning
-   ↓
-Next Scenario
+backend/
+  agents/          Orchestrator and five specialist agents
+  models/          Database models
+  routes/          API endpoints
+  schemas/         Request and response validation
+frontend/
+  src/app/         Next.js routes
+  src/views/       Page components
+  src/context/     Authentication and session state
+  src/services/    API client
+deployment/        Caddy configuration and hosting guide
+scripts/           Setup, launch, and isolated verification
+docs/              Project brief, architecture, demo guide, presentation
+compose.yaml       Container service configuration
 ```
 
-This closed feedback loop enables CyberShield to provide an increasingly personalized cybersecurity training experience.
+## Credential handling
 
----
+Never commit API keys, passwords, tokens, private keys, environment files, or user databases. Git and Docker ignore rules exclude private runtime files. The committed environment templates contain empty credential fields.
 
-## 🎓 Agentic AI Characteristics
+The submission scan checked known local credential values and common token patterns. It is not a comprehensive audit of the application's security or all historical commits. Store any database backups privately.
 
-### Goal-Driven Execution
+## Project status
 
-CyberShield continuously works toward improving learner cybersecurity decision-making.
+This is a hackathon training prototype. The credential-free workflow and frontend production build have passed local checks. Live provider inference, Google OAuth, educational effectiveness, and production scalability have not been established by those checks. Some alternate profile components contain illustrative data.
 
-### Dynamic Action Selection
+Future work includes a complete demo recording, deployment-host validation, broader authorization testing, schema migrations, and instructor review of generated content.
 
-Future scenarios are dynamically selected based on previous performance.
+## Team
 
-### Multi-Step Execution
+Akshay Kumar N, Pranav Y, Rishikesh Somnath, and Lalith Kumaar S.
 
-Multiple agents participate in each training cycle.
-
-### Adaptation
-
-Difficulty, topic selection, and feedback change according to learner performance.
-
-### Robustness
-
-Training can be paused, resumed, or stopped without breaking the learner's progression.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository.
-
-2. Create a feature branch:
-
-```bash
-git checkout -b feature/your-feature-name
-```
-
-3. Make your changes.
-
-4. Stage changes:
-
-```bash
-git add .
-```
-
-5. Commit:
-
-```bash
-git commit -m "Add your feature"
-```
-
-6. Push:
-
-```bash
-git push origin feature/your-feature-name
-```
-
-7. Open a Pull Request.
-
----
-
-## 🔗 Repository
-
-**GitHub Repository**
-
-https://github.com/Risikesh2006/cybersheild-1
-
----
-
-<div align="center">
-
-## 🛡️ CyberShield
-
-### Train. Defend. Adapt. Improve.
-
-**An Agentic AI approach to personalized cybersecurity training.**
-
-</div>
+Prepared for the **Agentic AI Hackathon at the Indian Institute of Technology Bhubaneswar**.
