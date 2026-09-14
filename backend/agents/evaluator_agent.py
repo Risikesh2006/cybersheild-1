@@ -10,7 +10,7 @@ from config import ANTHROPIC_API_KEY, CLAUDE_MODEL, VERDICT_SCORES
 class EvaluatorAgent:
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY) if ANTHROPIC_API_KEY else None
 
     def evaluate(
         self,
@@ -130,6 +130,8 @@ Return this exact JSON:
 }}"""
 
         try:
+            if self.client is None:
+                raise RuntimeError("Local demo: use built-in fallback")
             response = self.client.messages.create(
                 model=CLAUDE_MODEL,
                 max_tokens=1024,
