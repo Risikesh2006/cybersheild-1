@@ -2,6 +2,7 @@
 ScenarioGeneratorAgent — two-step agentic scenario generation (reasoning, then JSON).
 Uses Google Gemini when GEMINI_API_KEY is set; otherwise Anthropic Claude.
 """
+import os
 import json
 import re
 import secrets
@@ -16,7 +17,7 @@ from config import (
     GEMINI_SCENARIO_MODEL,
 )
 
-CLAUDE_SCENARIO_MODEL = "claude-sonnet-4-20250514"
+CLAUDE_SCENARIO_MODEL = os.getenv("CLAUDE_SCENARIO_MODEL", "claude-sonnet-4-20250514")
 
 
 def _extract_json_object(text: str) -> Optional[str]:

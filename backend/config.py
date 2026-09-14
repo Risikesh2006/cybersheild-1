@@ -1,13 +1,24 @@
 import os
+import secrets
 from dotenv import load_dotenv
 
 load_dotenv()
 
+DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
+
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+if DEMO_MODE:
+    ANTHROPIC_API_KEY = ""
+    GEMINI_API_KEY = ""
+
 # Scenario generation (Gemini); override if a model is unavailable in your region
 GEMINI_SCENARIO_MODEL = os.getenv("GEMINI_SCENARIO_MODEL", "gemini-2.0-flash")
-SECRET_KEY = os.getenv("SECRET_KEY", "changeme_secret_key_minimum_32_characters")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if ENVIRONMENT == "production" and (len(SECRET_KEY) < 32 or SECRET_KEY.lower().startswith(("changeme", "replace", "your_"))):
+    raise RuntimeError("Set a private random SECRET_KEY of at least 32 characters in production")
+SECRET_KEY = SECRET_KEY or secrets.token_urlsafe(48)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./cybershield.db")
@@ -18,7 +29,7 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 GOOGLE_OAUTH_REDIRECT = os.getenv("GOOGLE_OAUTH_REDIRECT", "http://localhost:8000/auth/google/callback")
 
 # AI Model
-CLAUDE_MODEL = "claude-3-5-haiku-20241022"
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-3-5-haiku-20241022")
 
 # XP Level thresholds
 LEVEL_THRESHOLDS = {
@@ -50,3 +61,7 @@ VERDICT_VALUES = {
     "Risky": 0.3,
     "Critical": 0.0,
 }
+
+CORS_ORIGINS = [v.strip().rstrip("/") for v in os.getenv("CORS_ORIGINS", FRONTEND_URL).split(",") if v.strip()]
+if ENVIRONMENT != "production":
+    CORS_ORIGINS += [f"http://{host}:{port}" for host in ("localhost", "127.0.0.1") for port in (3000, 3001, 3002, 5173)]
