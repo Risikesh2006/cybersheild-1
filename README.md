@@ -10,7 +10,7 @@ A central orchestrator coordinates five specialist agents for curriculum plannin
 
 [Presentation](docs/presentation/CyberShield_IIT_Bhubaneswar.pptx) ? [Architecture](docs/architecture.md) ? [Deployment guide](deployment/README.md) ? [Demo walkthrough](docs/demo-guide.md)
 
-## Submission materials
+## Submission materials 
 
 | Requirement | Deliverable |
 |---|---|
